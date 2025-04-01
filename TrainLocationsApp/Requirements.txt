@@ -1,0 +1,19 @@
+RDI Student Assistant Preliminary Task for applicants
+Task Description
+Your task is to create a website that retrieves the current train locations from DigiTraffic API and shows the locations in a map UI to the user. First check the API’s documentation and how to get data from the API. Also look into GitHub. You are free to choose which programming languages and technologies you want to use for this. The program should have following functionalities:
+
+Get the train location data from the API - done
+Show the locations of the trains to the user in map UI - done
+Extra points
+Automatic update of the train locations - done
+Getting information about the trains in the view and showing it to the user - done
+Good interface - 
+This task will be evaluated based on the functionalities, user interface and documentation. After you have developed the functionalities, you should focus more on the user interface and documentation. Mention also the technologies used in documentation.
+
+General steps
+Check the documentation of the Digitraffic API
+Create yourself a public repository in GitHub and start your project
+Choose the programming languages and technologies you feel best to fit for this project. * Remember to hide your API key from your public GitHub repository - no keys used, all public data
+Develop the functionalities mentioned above to your program.
+Create a README.md file for documentation to your GitHub repository.
+Return the task by following the instructions below.

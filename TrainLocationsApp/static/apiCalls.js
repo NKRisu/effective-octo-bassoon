@@ -1,12 +1,12 @@
+import { isTrainMarkerClicked } from './mapGraph.js';
 // API call URLs
 
 const train_locations_url = "https://rata.digitraffic.fi/api/v1/train-locations.geojson/latest";
-const update_times_url = "https://rata.digitraffic.fi/api/v1/update-times";
 const compositions_trains_url = "https://rata.digitraffic.fi/api/v1/compositions/{departure_date}/{train_number}";
 const stations_url = "https://rata.digitraffic.fi/api/v1/metadata/stations";
 
 const headers = {
-    "Digitraffic-User": "Junahenkilö/FoobarApp 1.0",    // Replace with actual user
+    "Digitraffic-User": "Junahenkilö/FoobarApp 1.0",    // Not using anything identifiable 
     "Accept-Encoding": "gzip",
 };
 
@@ -48,26 +48,32 @@ async function getAllRunningTrains() {
     }
 }
 
-async function getUpdateTimes() {
-    console.log("Fetching update times...");
+async function updateTrainLocation() {
+    
+
+    // Skip the API call if a train marker is clicked
+    if (isTrainMarkerClicked) {
+        console.log("Train marker is clicked. Skipping API call...");
+        return;
+    }
+
     try {
-        const response = await fetch(update_times_url, {
-            method: 'GET',
-            headers: headers,
-            mode: 'no-cors',
-        });
+        console.log("Updating train locations every 5 seconds...");
+        // Call getAllRunningTrains to fetch the latest train locations
+        const trains = await getAllRunningTrains();
+        console.log("Updated Train Locations:", trains);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        // Here you can add logic to update the map or UI with the new train data
+        // For example:
+        // updateMapWithTrains(trains);
 
-        const result = await response.json();
-        return result;
     } catch (error) {
-        console.error('Error fetching update times:', error);
-        throw error;
+        console.error("Error updating train locations:", error);
     }
 }
+
+// Set up an interval to call updateTrainLocation every 5 seconds
+setInterval(updateTrainLocation, 5000);
 
 async function getCompositionOfTrain(trainNumber, departureDate, stationMapping) {
     console.log("Fetching train composition...");
@@ -129,6 +135,8 @@ async function getCompositionOfTrain(trainNumber, departureDate, stationMapping)
         const compositionDetails = {
             trainNumber: trainComposition.trainNumber,
             departureDate: trainComposition.departureDate,
+            trainType: trainComposition.trainType || "Information not available",
+            trainCategory: trainComposition.trainCategory || "Information not available",
             journey: journeyDetails,
             locomotives: locomotiveDetails,
             wagons: wagonDetails,
@@ -208,8 +216,8 @@ getAllRunningTrains()
 console.log("Calling getStations...");
 getStations()
 
-console.log("Calling getUpdateTimes...");
-getUpdateTimes()
+console.log("Calling updateTrainLocation...");
+updateTrainLocation()
 
 console.log("Calling getCompositionOfTrain...");
 getCompositionOfTrain()
@@ -219,4 +227,4 @@ getStationMapping();
 
 console.log("API calls completed.");
 
-export { getAllRunningTrains, getStations, getUpdateTimes, getCompositionOfTrain, getStationMapping };
+export { getAllRunningTrains, getStations, updateTrainLocation, getCompositionOfTrain, getStationMapping };

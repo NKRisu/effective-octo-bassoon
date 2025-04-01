@@ -1,4 +1,4 @@
-import { getAllRunningTrains, getStations, getCompositionOfTrain, getUpdateTimes, getStationMapping } from './apiCalls.js';
+import { getAllRunningTrains, getStations, getCompositionOfTrain, updateTrainLocation, getStationMapping } from './apiCalls.js';
 
 // Initialize the map
 const map = L.map('map').setView([61.12171, 28.49411], 7); // Default center and zoom level
@@ -32,6 +32,12 @@ const trainMarkerIcon = L.icon({
     iconSize: [32, 32], // Size for train markers
 });
 
+// Track if marker is open, send it to apiCalls.js to pause the update timer
+export let isTrainMarkerClicked = false;
+
+// Map to store train markers by train number
+const trainMarkers = new Map();
+
 // Function to add train markers to the map
 async function addTrainMarkers() {
     try {
@@ -55,6 +61,7 @@ async function addTrainMarkers() {
             if (location) {
                 const marker = L.marker(location, { icon: trainMarkerIcon })
                     .addTo(map)
+                    // Only show details received from train location-API
                     .bindPopup(`
                         <b>Train Number:</b> ${train.trainNumber}<br>
                         <b>Speed:</b> ${train.speed} km/h<br>
@@ -64,19 +71,45 @@ async function addTrainMarkers() {
                 // Add click event listener to the marker
                 marker.on("click", () => {
                     console.log(`Train marker clicked: ${train.trainNumber}, ${train.departureDate}`);
+
+                    isTrainMarkerClicked = true;
                     
                     // Call getCompositionOfTrain with trainNumber, departureDate, and stationMapping
                     getCompositionOfTrain(train.trainNumber, train.departureDate, stationMapping)
                         .then(composition => {
                             if (composition) {
                                 console.log("Train Composition Details:", composition);
-                                // Display the composition details in a popup or sidebar
+                            
+                                const locomotives = composition.locomotives.map(loco => `
+                                    <li>Type: ${loco.type}, Power: ${loco.powerType}</li>
+                                `).join("");
+                            
+                                // Calculate the number of wagons
+                                const wagonCount = composition.wagons.length;
+                            
+                                // Generate a list of wagon types and their features
+                                const wagonDetails = composition.wagons.map(wagon => `
+                                    <li>Type: ${wagon.type}${wagon.petFriendly ? ", Pet-Friendly" : ""}${wagon.disabledAccess ? ", Disabled Access" : ""}${wagon.catering ? ", Catering" : ""}</li>
+                                `).join("");
+                            
+                                // Use trainType and trainCategory from the composition object
+                                const trainType = composition.trainType || "N/A";
+                                const trainCategory = composition.trainCategory || "N/A";
+                            
+                                // Display the composition details in a popup
                                 marker.bindPopup(`
                                     <b>Train Number:</b> ${composition.trainNumber}<br>
+                                    <b>Train Type:</b> ${trainType}<br>
+                                    <b>Train Category:</b> ${trainCategory}<br>
                                     <b>Start Station:</b> ${composition.journey.startStation}<br>
                                     <b>End Station:</b> ${composition.journey.endStation}<br>
                                     <b>Maximum Speed:</b> ${composition.maximumSpeed} km/h<br>
-                                    <b>Total Length:</b> ${composition.totalLength} m
+                                    <b>Speed:</b> ${train.speed} km/h<br>
+                                    <b>Total Length:</b> ${composition.totalLength} m<br>
+                                    <b>Locomotives:</b>
+                                    <ul>${locomotives}</ul>
+                                    <b>Wagons:</b> ${wagonCount}<br>
+                                    <ul>${wagonDetails}</ul>
                                 `).openPopup();
                             } else {
                                 console.warn("No composition data available.");
@@ -87,11 +120,51 @@ async function addTrainMarkers() {
                         });
                 });
 
+                // Reset the state when the popup is closed
+                marker.on("popupclose", () => {
+                    console.log("Popup closed for train marker:", train.trainNumber);
+                    isTrainMarkerClicked = false; // Reset the state
+                });
+
                 console.log("Marker added for train:", train.trainNumber);
             }
         });
     } catch (error) {
         console.error("Error adding train markers:", error);
+    }
+}
+
+
+
+// Function to periodically update train markers
+async function periodicallyUpdateTrainMarkers() {
+    try {
+        console.log("Fetching station mapping...");
+        const stationMapping = await getStationMapping();
+        console.log("Station mapping received:", stationMapping);
+
+        // Call updateTrainLocation every 5 seconds
+        setInterval(async () => {
+            if (isTrainMarkerClicked) {
+                console.log("Train marker is clicked. Skipping update...");
+                return; // Skip updates if a train marker is clicked
+            }
+
+            console.log("Updating train markers...");
+            const trains = await updateTrainLocation(); // Fetch updated train locations
+            console.log("Updated train data received:", trains);
+
+            // Clear existing markers and add new ones
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker && layer.options.icon === trainMarkerIcon) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            addTrainMarkers(trains, stationMapping);
+        }, 5000);
+    } catch (error) {
+        console.error("Error in periodically updating train markers:", error);
     }
 }
 
@@ -131,6 +204,9 @@ addTrainMarkers();
 
 console.log("Calling addStationMarkers...");
 addStationMarkers()
+
+console.log("Calling periodicallyUpdateTrainMarkers...");
+periodicallyUpdateTrainMarkers();
 
 // Export the function for use in app.js
 export { addTrainMarkers, addStationMarkers };
