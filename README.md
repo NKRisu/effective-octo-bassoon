@@ -76,13 +76,21 @@ This application displays real-time train locations on a map using data from the
 ## Folder Structure
 TrainLocationsApp/
 ├── app.js          # Deno server for serving the application
+
 ├── README.md       # Documentation for the application
+
 ├── views/
+
 │   └── index.html  # Main HTML file for the application
+
 ├── static/
+
 │   ├── images/     # Contains icons for map markers
+
 │   ├── apiCalls.js # Handles API calls to Digitraffic
+
 │   └── mapGraph.js # Handles map rendering and marker updates
+
 
 
 ---
