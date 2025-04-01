@@ -75,6 +75,7 @@ This application displays real-time train locations on a map using data from the
 
 ## Folder Structure
 TrainLocationsApp/
+
 ├── app.js          # Deno server for serving the application
 
 ├── README.md       # Documentation for the application
