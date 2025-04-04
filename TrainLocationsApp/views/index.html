@@ -5,14 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Train Locations</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        #map {
-            height: 100vh;
-        }
-    </style>
+    <link rel="stylesheet" href="./static/styles.css" />
 </head>
 <body>
-    <div id="map"></div>
+    <nav>
+        Train Locations App
+    </nav>
+    <div id="guide-container">
+        <div id="guide">
+            <h1>Map of all running trains in Finland.</h1>
+            <p>Click on a train marker to see the trains details.</p>
+            <p>The map stops refreshing after you have selected a train.</p>
+            <p>Click off, or close the pop up window to refresh the map.</p>
+        </div>
+    </div>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+    <footer>
+        <p>&copy; 2025 @NKRisu on GitHub.</p>
+    </footer>
+    <div id="banner"></div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module" src="./static/mapGraph.js"></script>
 </body>

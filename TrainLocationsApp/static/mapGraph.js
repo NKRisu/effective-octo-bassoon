@@ -1,24 +1,13 @@
 import { getAllRunningTrains, getStations, getCompositionOfTrain, updateTrainLocation, getStationMapping } from './apiCalls.js';
 
 // Initialize the map
-const map = L.map('map').setView([61.12171, 28.49411], 7); // Default center and zoom level
+const map = L.map('map').setView([64, 26], 6); // Default center and zoom level
 console.log("Map initialized:", map);
 
 // Add a tile layer (OpenStreetMap)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
-
-// Function to parse location string (e.g., "POINT (28.49411 61.12171)")
-function parseLocation(locationString) {
-    console.log("Parsing location string:", locationString);
-    const match = locationString.match(/POINT \(([-\d.]+) ([-\d.]+)\)/);
-    if (match) {
-        return [parseFloat(match[2]), parseFloat(match[1])]; // [latitude, longitude]
-    }
-    console.error("Failed to parse location string:", locationString);
-    return null;
-}
 
 // Station markers
 const stationMarkerIcon = L.icon({
