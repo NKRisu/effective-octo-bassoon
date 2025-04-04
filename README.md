@@ -10,7 +10,8 @@ This application displays real-time train locations on a map using data from the
 - Allows users to click on train markers to view detailed information about the train.
 - Automatically updates train locations every 5 seconds.
 - Uses public data from the Digitraffic API.
-- Provides a clean and user-friendly interface.
+- Provides a clean and user-friendly interface on the website.
+- Short instructions on the website on how the map view works.
 
 ---
 
@@ -82,11 +83,11 @@ TrainLocationsApp/
 
 ├── views/
 
-│   └── index.html  # Main HTML file for the application
+│   └── index.html  # HTML file for the application
 
 ├── static/
 
-│   ├── images/     # Contains icons for map markers
+│   ├── images/     # Contains icons folder for map marker images and banner image
 
 │   ├── apiCalls.js # Handles API calls to Digitraffic
 
@@ -112,17 +113,16 @@ TrainLocationsApp/
 
 ### Known Issues
 - **Flashing Markers**: When updating train locations, markers are removed and re-added, causing a flashing effect.
-- **Error Handling**: Limited error handling for API failures.
+- **Massive amounts of console logging**: Clean up on the console log calls is incoming. 
 
 ### Future Improvements
 - **Smooth Transitions**: Implement marker position updates instead of removing and re-adding markers.
-- **Enhanced UI**: Add more styling and features to improve user experience.
-- **Caching**: Cache station metadata to reduce redundant API calls.
+- **Caching**: Caching some trains that have speed of 0km/h to be updated less often.
 - **Removing all the logging**: Removing excess logging to clean up the console and the code
 
 ---
 
-## Author
+
 
 Application created by **NKRisu** on GitHub.  
 Using public data from the **Digitraffic API**.
